@@ -1,0 +1,53 @@
+There is a misunderstanding that the UniKG we constructed is a large-scale heterogeneous graph, rather than a knowledge graph. While some works have treated Wikidata as a knowledge graph, our work transforms it into a large-scale heterogeneous graph. If our expression has misled you, we will modify them in the next version of the manuscript. Based on this clarification:
+
+A1 for W1: We have realize some confusion in related works and references and will modify these issues in the next version. We follow the definitions: 1) Heterogeneous Graph[A.6, 37, A.7]: Graphs with multi-types of nodes and edges. 2) Knowledge Graph[A.8, 24]: Knowledge Graphs consist of facts with entities and relations. We constructed a large-scale heterogeneous graph from Wikidata and endeavored to maintain clear expressions within the context, such as using "knowledge graph" at Sec 3.1 and Sec 3.2 (pre-construction), while employing "heterogeneous graph" at Sec 3.3 and later (post-construction). Thank very much for your correction.
+
+A2 for W2: The UniKG dataset is a large-scale heterogeneous graph rather than a knowledge graph. For existing HG datasets, the types of entities and relationships are rather limited, which greatly limits their capacity to facilitate heterogeneous graph representation and abundant real-world knowledge extraction. Hence, we introduce such a large-scale heterogeneous graph to facilitate downstream tasks. Additionally, although UniKG originates from a knowledge graph, our work treats it as a heterogeneous graph. Consequently, we evaluated the node classification task, which is a popular task for existing heterogeneous graph representation learning methods[A.6, 37, A.7].
+
+[A.6] Huiting Hong, Hantao Guo, Yucheng Lin, Xiaoqing Yang, Zang Li, and Jieping Ye. An attention-based graph neural network for heterogeneous structural learning. In Proceedings of the AAAI conference on artificial intelligence, pages 4132-4139, 2020.
+[37] Xiao Wang, Yuanfu Lu, Chuan Shi, Ruijia Wang, Peng Cui, and Shuai Mou. Dynamic heterogeneous information network embedding with meta-path based proximity. IEEE Transactions on Knowledge and Data Engineering, 34(3): 1117-1132, 2020.
+[A.7] Fanjin Zhang, Xiao Liu, Jie Tang, Yuxiao Dong, Peiran Yao, Jie Zhang, Xiaotao Gu, Yan Wang, Bin Shao, Rui Li, et al. Oag: Toward linking large-scale heterogeneous entity graphs. In Proceedings of the 25th ACM SIGKDD international conference on knowledge discovery & data mining, pages 2585-2595, 2019.
+[A.8] Kian Ahrabian, Xinwei Du, Richard Delwin Myloth, Arun Baalaaji Sankar Ananthan, and Jay Pujara. Pubgraph: A large scale scientific temporal knowledge graph. arXiv preprint arXiv:2302.02231, 2023.
+[24]Haoran Luo, E Haihong, Ling Tan, Gengxian Zhou, Tianyu Yao, and Kaiyang Wan. Dhge: Dual-view hyper-relational knowledge graph embedding for link prediction and entity typing. In Proceedings of the AAAI Conference on Artificial Intelligence, pages 6467-6474, 2023.
+
+A3(a) for W3(a): We have provided detailed descriptions of the construction process as much as possible, for example, in Section 3.1, where we describe the instance extraction process using 'Belgium (Q31)' as an example. This includes the extraction of its ID, description, labels, and various 'claims (as relationships)'. Following your suggestion, we will include a visual extraction example in the next version.
+
+A3(b) for W3(b): Anisotropic Propagation (AP) aims to anisotropically propagate semantic features to generate multi-hop propagation features in the feature propagation process. This approach enables the generation of rich structural semantics for model input. However, traditional GNNs suffer from scalability issues on large graphs [39,9,44]. Traditional GNNs need to convolute isotropically neighborhoods layer by layer, which becomes challenging in terms of temporal and spatial complexity on large graphs. Leveraging HGD and APM, convolution results are precomputed anisotropically once on the CPU, enabling the feature mapping process to efficiently train subsequent classifiers, which can facilitate efficient representation learning on large-scale heterogeneous graphs.
+
+[39]Felix Wu, Amauri Souza, Tianyi Zhang, Christopher Fifty, Tao Yu, and Kilian Weinberger. 2019. Simplifying graph convolutional networks. In International conference on machine learning. PMLR, 6861-6871.
+[9]Fabrizio Frasca, Emanuele Rossi, Davide Eynard, Ben Chamberlain, Michael Bronstein, and Federico Monti. 2020. Sign: Scalable inception graph neural networks. arXiv preprint arXiv:2004.11198 (2020).
+[44]Wentao Zhang, Ziqi Yin, Zeang Sheng, Yang Li, Wen Ouyang, Xiaosen Li, Yangyu Tao, Zhi Yang, and Bin Cui. 2022. Graph attention multi-layer perceptron. In Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining. 4560-4570.
+
+A3(c) for W3(c): No, this adjacency matrix contains all relationships. It can be understood as a multi-channel adjacency matrix \mathbf{A}^{r}\in  \mathbb{R}^{n\times n\times d}, where each channel represents a dimension of the relationship embedding \mathbf{r}\in  \mathbb{R}^{1\times d} corresponding to the edge. During construction, we utilize PLM (Pre-trained Language Models, such as BERT and CLIP) to extract embeddings of aligned entity descriptions and relationship descriptions. For more details, please refer to Section 3.2.
+
+A3(d) for W3(d): We has described the knowledge transfer process: we incorporate pre-trained UniKG node representations into the item initialization embeddings of the recommender system or use them as reconstruction targets to constrain semantic bias. For details, see Section 5.2, from "For the methods" to "intrinsic similarity". This transfer paradigm follows some existing works, such as [A.3].
+
+[A.3] Kexin Huang and Marinka Zitnik. 2020. Graph meta learning via local subgraphs. Advances in neural information processing systems 33 (2020), 5862-5874.
+
+
+A4 for W4: We have attempted the three baselines you mentioned：
+
+B1: Simple and Efficient Heterogeneous Graph Neural Network (SeHGNN)
+We have made efforts to reproduce SeHGNN on UniKG but encountered an Out of Memory (OOM) error. The analysis of the issue is as follows:
+SeHGNN achieved excellent performance on OGBN-MAG. However, employing SeHGNN on UniKG incurs significant temporal and spatial costs due to the much higher complexity of UniKG (77 million nodes and 1 type, 0.6 billion edges and 2082 types) compared to OGBN-MAG (1.9 million nodes and 4 types, 21 million edges and 7 types).
+SeHGNN propagates node features along meta-paths, aiming to compute the node feature matrix under each meta-path view. Its spatial complexity is O(RNd), where R is the number of meta-path types. In MAG, R=7 as there are 7 types (only second-order meta-paths), while in UniKG, R=2082 (same as MAG, considering second-order meta-paths). N is the number of nodes, which is 77312474 for UniKG. And d=256 is the dimension of node feature, consistent with MAG.
+Under this setting, the memory required to compute heterogeneous meta-path features for UniKG is approximately (2082*77312474*256)*2B≈74.95TB (assuming float16 type). We cannot afford such a high space overhead.
+In comparison, the space overhead of our proposed HGD, during training on UniKG is approximately 270GB, which is over 284 times smaller than SeHGNN (actually more, as we are only comparing the feature matrixes of SeHGNN here).
+
+B2: An Attention-based Graph Neural Network for Heterogeneous Structural Learning (Hetsann)
+We have made efforts to reproduce Hetsann on UniKG but were unsuccessful. The analysis of the issue is as follows:
+1.Hetsann was not developed for large-scale graphs and is primarily applied to small-scale graphs such as Aminer. This is not the focus of our study. We cite this work to illustrate that such methods lack scalability on large-scale heterogeneous graphs [44]. This could be a promising avenue for future research, aiming to effectively extend meta-path-based methods like Hetsann to large-scale heterogeneous graphs such as UniKG.
+2.Hetsann is a 6-year-old work and is only available in TensorFlow 1.6, which conflicts with our current environment.
+3.UniKG (77 million nodes and 1 type, 0.6 billion edges and 2082 types) is much more complex than Aminer (28253 nodes and 2 types, 0.13 million edges and 4 types), requiring carefully designed sampling methods and training strategies. This may necessitate extensive modifications to the framework of Hetsann.
+In conclusion, we are unable to effectively address the above issues within the limited timeframe of less than a week. However, we will explore such methods in future work. Thank you very much for your review and suggestions.
+
+[44]Wentao Zhang, Ziqi Yin, Zeang Sheng, Yang Li, Wen Ouyang, Xiaosen Li, Yangyu Tao, Zhi Yang, and Bin Cui. 2022. Graph attention multi-layer perceptron. In Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining. 4560-4570.
+
+
+B3: Interpretable and Efficient Heterogeneous Graph Convolutional Network
+Following your advice, we have reproduced ie-HGCN on UniKG-1M, although such methods are not the focus of our study. UniKG-1M is a subgraph of UniKG-Full, consisting of 1,003,188 nodes and 24,509,242 edges. We utilized the HGTSample technique [18] and trained ie-HGCN on a multi-label classification task with 2000 categories, consistent with the GCN/HAN/HGT in manuscript.
+Our experimental setup is as follows: we used the same parameters for HGTSample as for GCN/HAN/HGT. On the sampled subgraph, we learned node representations for each relationship subgraph and introduced relationship-wise attention mechanisms. After training for 100 epochs, we obtained ie-HGCN performance metrics: Acc: 40.47%, precision: 33.42%, recall: 41.88%, f1: 37.18, which falls between HAN and HGT, significantly lower than our proposed HGD. The time cost is 2411.8 minutes per 1 millions nodes, which falls between HAN and HGT, higher than HGD by 131 times. This indicates that ie-HGCN is hard to effectively learn the multi-attribute structures in UniKG.
+We will include ie-HGCN as one of our baselines in the next version. Thank you for your review and suggestions.
+The code is available at: https://anonymous.4open.science/r/ie-HGCN_repo_UniKG-7B82.
+
+[18]Ziniu Hu, Yuxiao Dong, Kuansan Wang, and Yizhou Sun. 2020. Heterogeneous graph transformer. In Proceedings of the web conference 2020. 2704-2710
